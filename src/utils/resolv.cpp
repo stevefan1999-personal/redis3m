@@ -8,6 +8,10 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #else
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #endif
