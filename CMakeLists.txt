@@ -7,8 +7,8 @@ if(CMAKE_GENERATOR MATCHES ".*(Make|Ninja).*"
   message(STATUS "CMAKE_BUILD_TYPE not specified. Using ${CMAKE_BUILD_TYPE} build")
 endif()
 
-option(BUILD_TESTING "Build tests?" NO)
-option(REDIS3M_BUILD_DOXYGEN "Build doxygen if available?" NO)
+option(BUILD_TESTING "Build tests?" OFF)
+option(REDIS3M_BUILD_DOXYGEN "Build doxygen if available?" OFF)
 
 
 find_package(Boost COMPONENTS system filesystem unit_test_framework date_time regex REQUIRED)
