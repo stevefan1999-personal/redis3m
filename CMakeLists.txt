@@ -7,6 +7,10 @@ if(CMAKE_GENERATOR MATCHES ".*(Make|Ninja).*"
   message(STATUS "CMAKE_BUILD_TYPE not specified. Using ${CMAKE_BUILD_TYPE} build")
 endif()
 
+option(BUILD_TESTING "Build tests?" NO)
+option(REDIS3M_BUILD_DOXYGEN "Build doxygen if available?" NO)
+
+
 find_package(Boost COMPONENTS system filesystem unit_test_framework date_time regex REQUIRED)
 find_package(Threads REQUIRED)
 
@@ -22,8 +26,8 @@ set(REDIS3M_VERSION_MAJOR 9)
 set(REDIS3M_VERSION_MINOR 9)
 set(REDIS3M_VERSION_PATCH 9)
 set(REDIS3M_VERSION_STRING ${REDIS3M_VERSION_MAJOR}.${REDIS3M_VERSION_MINOR}.${REDIS3M_VERSION_PATCH})
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -std=c++11 -ggdb -pipe -fPIC -Wall -Wpedantic ${NO_BOOST_CFLAG}")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -std=c++11 -pipe -fPIC -Wall -Wpedantic ${NO_BOOST_CFLAG}")
+# set(CMAKE_CXX_FLAGS_DEBUG "-O0 -std=c++11 -ggdb -pipe -fPIC -Wall -Wpedantic ${NO_BOOST_CFLAG}")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -std=c++11 -pipe -fPIC -Wall -Wpedantic ${NO_BOOST_CFLAG}")
 if(CMAKE_BUILD_TYPE STREQUAL Release)
     set(datadir ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
 else()
@@ -86,33 +90,37 @@ add_executable(cluster_pool_test tests/cluster_pool.cpp)
 target_link_libraries(cluster_pool_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
                               ${Boost_SYSTEM_LIBRARY}
                               ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-enable_testing ()
+if (BUILD_TESTING)
+    enable_testing ()
 
-add_test (NAME connection COMMAND connection_test)
-#add_test (NAME connection_pool COMMAND connection_pool_test)
-add_test (NAME patterns COMMAND patterns_test)
+    add_test (NAME connection COMMAND connection_test)
+    #add_test (NAME connection_pool COMMAND connection_pool_test)
+    add_test (NAME patterns COMMAND patterns_test)
+endif()
 
+if (REDIS3M_BUILD_DOXYGEN)
 # Docs
-FIND_PACKAGE(Doxygen QUIET)
-IF (DOXYGEN_FOUND)
-        SET(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/Doxyfile")
-  SET(DOXYGEN_OUTPUT "docs")
+    FIND_PACKAGE(Doxygen QUIET)
+    IF (DOXYGEN_FOUND)
+            SET(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/Doxyfile")
+      SET(DOXYGEN_OUTPUT "docs")
 
-  ADD_CUSTOM_COMMAND(
-      OUTPUT ${DOXYGEN_OUTPUT}
-        COMMAND ${CMAKE_COMMAND} -E echo_append "Building API Documentation..."
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
-        COMMAND ${CMAKE_COMMAND} -E echo "Done."
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        DEPENDS ${DOXYGEN_INPUT}
-  )
+      ADD_CUSTOM_COMMAND(
+          OUTPUT ${DOXYGEN_OUTPUT}
+            COMMAND ${CMAKE_COMMAND} -E echo_append "Building API Documentation..."
+            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
+            COMMAND ${CMAKE_COMMAND} -E echo "Done."
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            DEPENDS ${DOXYGEN_INPUT}
+      )
 
-  ADD_CUSTOM_TARGET(apidoc ALL DEPENDS ${DOXYGEN_OUTPUT})
+      ADD_CUSTOM_TARGET(apidoc ALL DEPENDS ${DOXYGEN_OUTPUT})
 
-  ADD_CUSTOM_TARGET(apidoc_forced
-  COMMAND ${CMAKE_COMMAND} -E echo_append "Building API Documentation..."
-  COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
-  COMMAND ${CMAKE_COMMAND} -E echo "Done."
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+      ADD_CUSTOM_TARGET(apidoc_forced
+      COMMAND ${CMAKE_COMMAND} -E echo_append "Building API Documentation..."
+      COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
+      COMMAND ${CMAKE_COMMAND} -E echo "Done."
+      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
-ENDIF (DOXYGEN_FOUND)
+    ENDIF (DOXYGEN_FOUND)
+endif()
