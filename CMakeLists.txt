@@ -72,6 +72,7 @@ endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" DESTINATION ${libdir}/pkgconfig)
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/data/lua" DESTINATION ${datadir})
 
+if (BUILD_TESTING)
 # Tests
 add_executable(connection_test tests/connection.cpp tests/common.h)
 target_link_libraries(connection_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
@@ -90,7 +91,6 @@ add_executable(cluster_pool_test tests/cluster_pool.cpp)
 target_link_libraries(cluster_pool_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
                               ${Boost_SYSTEM_LIBRARY}
                               ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-if (BUILD_TESTING)
     enable_testing ()
 
     add_test (NAME connection COMMAND connection_test)
