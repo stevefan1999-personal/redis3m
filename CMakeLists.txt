@@ -73,33 +73,33 @@ install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc" DESTINATION ${lib
 install(DIRECTORY "${CMAKE_SOURCE_DIR}/data/lua" DESTINATION ${datadir})
 
 if (BUILD_TESTING)
-# Tests
-add_executable(connection_test tests/connection.cpp tests/common.h)
-target_link_libraries(connection_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
-                              ${Boost_SYSTEM_LIBRARY}
-                              ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-add_executable(patterns_test tests/patterns.cpp)
-target_link_libraries(patterns_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
-                              ${Boost_SYSTEM_LIBRARY}
-                              ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
-add_executable(connection_pool_test tests/connection_pool.cpp)
-target_link_libraries(connection_pool_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
-                              ${Boost_SYSTEM_LIBRARY}
-                              ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
-                              ${CMAKE_THREAD_LIBS_INIT})
-add_executable(cluster_pool_test tests/cluster_pool.cpp)
-target_link_libraries(cluster_pool_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
-                              ${Boost_SYSTEM_LIBRARY}
-                              ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
     enable_testing ()
 
+    # Tests
+    add_executable(connection_test tests/connection.cpp tests/common.h)
+    target_link_libraries(connection_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
+                                  ${Boost_SYSTEM_LIBRARY}
+                                  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    add_executable(patterns_test tests/patterns.cpp)
+    target_link_libraries(patterns_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
+                                  ${Boost_SYSTEM_LIBRARY}
+                                  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
+    add_executable(connection_pool_test tests/connection_pool.cpp)
+    target_link_libraries(connection_pool_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
+                                  ${Boost_SYSTEM_LIBRARY}
+                                  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
+                                  ${CMAKE_THREAD_LIBS_INIT})
+    add_executable(cluster_pool_test tests/cluster_pool.cpp)
+    target_link_libraries(cluster_pool_test ${PROJECT_NAME}-static ${Boost_FILESYSTEM_LIBRARY}
+                                  ${Boost_SYSTEM_LIBRARY}
+                                  ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY})
     add_test (NAME connection COMMAND connection_test)
     #add_test (NAME connection_pool COMMAND connection_pool_test)
     add_test (NAME patterns COMMAND patterns_test)
 endif()
 
 if (REDIS3M_BUILD_DOXYGEN)
-# Docs
+    # Docs
     FIND_PACKAGE(Doxygen QUIET)
     IF (DOXYGEN_FOUND)
             SET(DOXYGEN_INPUT "${CMAKE_SOURCE_DIR}/Doxyfile")
