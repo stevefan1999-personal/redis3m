@@ -43,7 +43,7 @@ file(GLOB SRC_FILES "src/*.cpp" "src/utils/*.cpp" "src/patterns/*.cpp")
 file(GLOB INCLUDE_FILES "include/redis3m/*.h*" "include/redis3m/utils/*.h" "include/redis3m/patterns/*.h*")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/utils/datadir.cpp.in
   ${CMAKE_CURRENT_BINARY_DIR}/datadir.cpp @ONLY)
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${CMAKE_CURRENT_BINARY_DIR}/datadir.cpp ${INCLUDE_FILES})
+add_library(${PROJECT_NAME} ${SRC_FILES} ${CMAKE_CURRENT_BINARY_DIR}/datadir.cpp ${INCLUDE_FILES})
 target_link_libraries(${PROJECT_NAME} hiredis ${REDIS3M_BOOST_LIBS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE ${REDIS3M_BOOST_INC})
 
