@@ -13,6 +13,7 @@
 #include <redis3m/utils/logging.h>
 #include <chrono>
 #include <thread>
+#include <random>
 #ifndef NO_BOOST
 #include <boost/algorithm/string/find.hpp>
 #include <boost/regex.hpp>
@@ -226,7 +227,9 @@ connection::ptr_t connection_pool::create_slave_connection()
     sentinel->append(command("SENTINEL") << "slaves" << master_name );
     reply response = sentinel->get_reply();
     std::vector<reply> slaves(response.elements());
-    std::random_shuffle(slaves.begin(), slaves.end());
+
+    std::random_device rd;
+    std::shuffle(slaves.begin(), slaves.end(), std::mt19937(rd()));
 
     for (std::vector<reply>::const_iterator it = slaves.begin();
          it != slaves.end(); ++it)
