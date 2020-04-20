@@ -47,7 +47,9 @@ public:
     {
         return ptr_t(new connection(path));
     }
-
+    
+    connection(const std::string& host, const unsigned int port);
+    connection(const std::string& path);
     ~connection();
 
     bool is_valid() const;
@@ -99,8 +101,6 @@ public:
 
 private:
     friend class connection_pool;
-    connection(const std::string& host, const unsigned int port);
-    connection(const std::string& path);
 
     role_t _role;
     redisContext *c;
