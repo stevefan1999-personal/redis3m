@@ -9,23 +9,22 @@ endif()
 
 option(BUILD_TESTING "Build tests?" OFF)
 option(REDIS3M_BUILD_DOXYGEN "Build doxygen if available?" OFF)
+option(REDIS3M_USE_BOOST "Use Boost if available?" ON)
 
-find_package(Boost COMPONENTS system filesystem unit_test_framework date_time regex REQUIRED)
 find_package(Threads REQUIRED)
 
 # to be used from command line: cmake NO_BOOST=YES
-if(NO_BOOST)
-  set(NO_BOOST_CFLAG -DNO_BOOST)
-else(NO_BOOST)
+if (REDIS3M_USE_BOOST)
+  find_package(Boost COMPONENTS system filesystem unit_test_framework date_time regex REQUIRED)
   set(REDIS3M_BOOST_INC ${Boost_INCLUDE_DIRS})
   set(REDIS3M_BOOST_LIBS ${Boost_REGEX_LIBRARY} ${Boost_DATE_TIME_LIBRARY})
-endif(NO_BOOST)
+endif()
 
 set(REDIS3M_VERSION_MAJOR 9)
 set(REDIS3M_VERSION_MINOR 9)
 set(REDIS3M_VERSION_PATCH 9)
 set(REDIS3M_VERSION_STRING ${REDIS3M_VERSION_MAJOR}.${REDIS3M_VERSION_MINOR}.${REDIS3M_VERSION_PATCH})
-if(CMAKE_BUILD_TYPE STREQUAL Release)
+if (CMAKE_BUILD_TYPE STREQUAL Release)
     set(datadir ${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME})
 else()
    set(datadir data)
@@ -48,10 +47,15 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/utils/datadir.cpp.in
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES} ${CMAKE_CURRENT_BINARY_DIR}/datadir.cpp ${INCLUDE_FILES})
 target_link_libraries(${PROJECT_NAME} hiredis ${REDIS3M_BOOST_LIBS})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE ${REDIS3M_BOOST_INC})
-
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${REDIS3M_VERSION_STRING} SOVERSION ${REDIS3M_VERSION_MAJOR})
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_RELEASE "DATADIR=\"${datadir}\"")
 set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_DEFINITIONS_DEBUG "DATADIR=\"${CMAKE_SOURCE_DIR}/data\"")
+if (NOT REDIS3M_USE_BOOST)
+  target_compile_definitions(
+    ${PROJECT_NAME} 
+    PRIVATE NO_BOOST
+  )
+endif()
 
 # Static library
 add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES} ${CMAKE_CURRENT_BINARY_DIR}/datadir.cpp ${INCLUDE_FILES})
@@ -59,6 +63,13 @@ target_link_libraries(${PROJECT_NAME}-static hiredis ${REDIS3M_BOOST_LIBS})
 target_include_directories(${PROJECT_NAME}-static PUBLIC ${PROJECT_SOURCE_DIR}/include PRIVATE ${REDIS3M_BOOST_INC})
 set_target_properties(${PROJECT_NAME}-static PROPERTIES COMPILE_DEFINITIONS_RELEASE "DATADIR=\"${datadir}\"")
 set_target_properties(${PROJECT_NAME}-static PROPERTIES COMPILE_DEFINITIONS_DEBUG "DATADIR=\"${CMAKE_SOURCE_DIR}/data\"")
+
+if (NOT REDIS3M_USE_BOOST)
+  target_compile_definitions(
+    ${PROJECT_NAME}-static
+    PRIVATE NO_BOOST
+  )
+endif()
 
 install (TARGETS ${PROJECT_NAME} DESTINATION lib${LIB_SUFFIX})
 install (DIRECTORY "${CMAKE_SOURCE_DIR}/include/${PROJECT_NAME}" DESTINATION include)
